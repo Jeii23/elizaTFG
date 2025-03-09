@@ -5,6 +5,7 @@ export const mainCharacter: Character = {
     plugins: [],
     modelProvider: ModelProviderName.GAIANET,
     settings: {
+        model: "gpt-4o-mini",
         secrets: {},
         voice: {
             model: "en_US-hfc_female-medium",

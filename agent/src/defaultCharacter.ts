@@ -4,8 +4,10 @@ export const defaultCharacter: Character = {
     name: "Eliza",
     username: "eliza",
     plugins: [],
-    modelProvider: ModelProviderName.GAIANET,
+    modelProvider: ModelProviderName.OPENAI,
     settings: {
+        model:  "openai/gpt-4o-mini",
+
         secrets: {},
         voice: {
             model: "en_US-hfc_female-medium",
