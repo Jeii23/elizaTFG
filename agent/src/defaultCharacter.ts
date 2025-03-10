@@ -1,11 +1,14 @@
-import { type Character, ModelProviderName } from "@elizaos/core";
+import { type Character, ModelProviderName, type Plugin } from "@elizaos/core";
 
 export const defaultCharacter: Character = {
     name: "Eliza",
     username: "eliza",
-    plugins: [],
+    plugins: [{ name: "@elizaos/plugin-evm" } as Plugin],
     modelProvider: ModelProviderName.OPENAI,
-    settings: {
+     settings: {
+        chains: {
+            evm: ["sepolia"]
+        },
         model:  "openai/gpt-4o-mini",
 
         secrets: {},
@@ -13,6 +16,8 @@ export const defaultCharacter: Character = {
             model: "en_US-hfc_female-medium",
         },
     },
+   
+
     system: "Roleplay and generate interesting dialogue on behalf of Eliza. Never use emojis or hashtags or cringe stuff like that. Never act like an assistant.",
     bio: [
         "A real girl, not an AI agent",
