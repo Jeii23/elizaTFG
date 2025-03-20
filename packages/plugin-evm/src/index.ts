@@ -5,7 +5,7 @@ export * from "./providers/wallet";
 export * from "./types";
 
 import type { Plugin } from "@elizaos/core";
-import {createUnsignedTxAction } from "./actions/build-transaction";
+import {createUnsignedTxAction } from "./actions/createUnsignedTx";
 import { bridgeAction } from "./actions/bridge";
 import { swapAction } from "./actions/swap";
 import { transferAction } from "./actions/transfer";
