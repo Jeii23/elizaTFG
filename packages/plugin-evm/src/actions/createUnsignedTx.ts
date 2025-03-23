@@ -26,7 +26,7 @@ export class CreateUnsignedTxAction {
   }
 }
 
-const buildTransferDetails = async (
+const buildUnsignedTx = async (
   state: State,
   runtime: IAgentRuntime
 ): Promise<BuildParams> => {
@@ -36,19 +36,19 @@ const buildTransferDetails = async (
     template: unsignedTxTemplate,
   });
 
-  const transferDetails = (await generateObjectDeprecated({
+  const unsignedTx = (await generateObjectDeprecated({
     runtime,
     context,
     modelClass: ModelClass.SMALL,
   })) as BuildParams;
 
   // Comprovem si s'ha generat un objecte vàlid
-  if (!transferDetails) {
+  if (!unsignedTx) {
     throw new Error("Error: No s'han pogut generar els paràmetres per la transacció unsigned.");
   }
 
   // Comprovem que existeixi el camp 'toAddress'
-  if (!transferDetails.toAddress || transferDetails.toAddress.trim() === "") {
+  if (!unsignedTx.toAddress || unsignedTx.toAddress.trim() === "") {
     throw new Error("Error: Falta 'toAddress' en els paràmetres de la transacció unsigned.");
   }
 
@@ -57,27 +57,28 @@ const buildTransferDetails = async (
   if (envFromAddress) {
     const trimmedEnv = envFromAddress.trim();
     if (trimmedEnv.startsWith("0x")) {
-      transferDetails.fromAddress = trimmedEnv as `0x${string}`;
+      unsignedTx.fromAddress = trimmedEnv as `0x${string}`;
     } else {
       throw new Error("EVM_PUBLIC_ADDRESS must be a valid hex string starting with '0x'");
     }
   } else {
-    transferDetails.fromAddress = transferDetails.fromAddress
-      ? (transferDetails.fromAddress.trim() as `0x${string}`)
+    unsignedTx.fromAddress = unsignedTx.fromAddress
+      ? (unsignedTx.fromAddress.trim() as `0x${string}`)
       : "0xElTeuCompte" as `0x${string}`;
   }
 
   // Neteja d'espais per si els camps ja els tenen
-  transferDetails.toAddress = transferDetails.toAddress.trim() as `0x${string}`;
-  if (transferDetails.fromAddress) {
-    transferDetails.fromAddress = transferDetails.fromAddress.trim() as `0x${string}`;
+  unsignedTx.toAddress = unsignedTx.toAddress.trim() as `0x${string}`;
+  if (unsignedTx.fromAddress) {
+    unsignedTx.fromAddress = unsignedTx.fromAddress.trim() as `0x${string}`;
   }
 
-  return transferDetails;
+  return unsignedTx;
 };
-
+//TODO: REVISAR
 export const createUnsignedTxAction: Action = {
   name: "createUnsignedTx",
+  similes: ["CREATE_UNSIGNED_TX", "UNSIGNED_TRANSACTION", "TX_JSON", "BUILD_TRANSACTION", "createUnsignedTx"],
   description:
     "Genera un JSON per una transacció no signada, amb els camps 'from', 'to' i 'value'",
   handler: async (
@@ -94,7 +95,7 @@ export const createUnsignedTxAction: Action = {
       console.log("CreateUnsignedTx action handler called");
 
       // Obtenim els detalls de la transferència i validem els paràmetres
-      const params = await buildTransferDetails(state, runtime);
+      const params = await buildUnsignedTx(state, runtime);
       const actionInstance = new CreateUnsignedTxAction();
       // Aquest mètode pot llençar un error si l'import és invàlid.
       const unsignedTx = await actionInstance.createUnsignedTx(params);

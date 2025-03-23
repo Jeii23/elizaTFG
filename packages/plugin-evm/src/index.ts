@@ -3,6 +3,7 @@ export * from "./actions/swap";
 export * from "./actions/transfer";
 export * from "./providers/wallet";
 export * from "./types";
+export * from "./actions/createUnsignedTx";
 
 import type { Plugin } from "@elizaos/core";
 import {createUnsignedTxAction } from "./actions/createUnsignedTx";
