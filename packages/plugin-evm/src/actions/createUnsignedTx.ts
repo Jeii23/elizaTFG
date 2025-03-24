@@ -80,7 +80,7 @@ export const createUnsignedTxAction: Action = {
   name: "createUnsignedTx",
   similes: ["CREATE_UNSIGNED_TX", "UNSIGNED_TRANSACTION", "TX_JSON", "BUILD_TRANSACTION", "createUnsignedTx"],
   description:
-    "Genera un JSON per una transacció no signada, amb els camps 'from', 'to' i 'value'",
+    "Generate a JSON for an unsigned transaction, with the fields 'from', 'to', and 'value'.",
   handler: async (
     runtime: IAgentRuntime,
     message: Memory,
