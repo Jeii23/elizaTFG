@@ -81,48 +81,59 @@ export const createUnsignedTxAction: Action = {
   similes: ["CREATE_UNSIGNED_TX", "UNSIGNED_TRANSACTION", "TX_JSON", "BUILD_TRANSACTION", "createUnsignedTx"],
   description:
     "Generate a JSON for an unsigned transaction, with the fields 'from', 'to', and 'value'.",
-  handler: async (
-    runtime: IAgentRuntime,
-    message: Memory,
-    state: State,
-    _options: any,
-    callback?: HandlerCallback
-  ) => {
-    try {
-      state = state
-        ? await runtime.updateRecentMessageState(state)
-        : (await runtime.composeState(message)) as State;
+    handler: async (
+      runtime: IAgentRuntime,
+      message: Memory,
+      state: State,
+      _options: any,
+      callback?: HandlerCallback
+    ) => {
+      // Inicialitzem l'estat fora del bloc try, de la mateixa manera que en l'altre codi
+      if (!state) {
+        state = (await runtime.composeState(message)) as State;
+      } else {
+        state = await runtime.updateRecentMessageState(state);
+      }
+    
       console.log("CreateUnsignedTx action handler called");
-
-      // Obtenim els detalls de la transferència i validem els paràmetres
-      const params = await buildUnsignedTx(state, runtime);
-      const actionInstance = new CreateUnsignedTxAction();
-      // Aquest mètode pot llençar un error si l'import és invàlid.
-      const unsignedTx = await actionInstance.createUnsignedTx(params);
-
-      if (callback) {
-        callback({
-          text: "Transacció no signada generada correctament.",
-          content: unsignedTx,
-        });
-      }
-      return true;
-    } catch (error: any) {
-      // Si l'error és un dels nostres errors controlats, gestiona'l i retorna false.
-      if (
-        error.message &&
-        (error.message.includes("No s'han pogut generar") ||
-          error.message.includes("Falta 'toAddress'"))
-      ) {
-        if (callback) {
-          callback({ text: error.message });
+    
+      try {
+        const params = await buildUnsignedTx(state, runtime);
+        const actionInstance = new CreateUnsignedTxAction();
+        // Aquest mètode pot llençar un error si l'import és invàlid
+        const unsignedTx = await actionInstance.createUnsignedTx(params);
+    
+        if(callback){
+          callback({
+          text: `Successfully created an unsigned tx ${params.amount} tokens to ${params.toAddress}'`,
+          content: {
+            success: true,
+            unsignedTx,
+          },
+          });
         }
-        return false;
+        // Obtenim els detalls de la transacció i validem els paràmetres
+       
+        // En cas d'èxit retornem true sense trucar al callback
+        return true;
+      } catch (error: any) {
+        console.error("Error during CreateUnsignedTx action:", error);
+        // Si l'error és un dels nostres errors controlats, notifiquem via callback
+        if (
+          error.message &&
+          (error.message.includes("No s'han pogut generar") ||
+            error.message.includes("Falta 'toAddress'"))
+        ) {
+          if (callback) {
+            callback({ text: error.message, content: { error: error.message } });
+          }
+          return false;
+        }
+        // Per altres errors, relançem l'error per rebutjar la promesa
+        throw error;
       }
-      // Per altres errors (per exemple, d'un import invàlid) reenvia l'error per rebutjar la promesa.
-      throw error;
-    }
-  },
+    },
+    
   validate: async (runtime: IAgentRuntime) => {
     // No es requereix cap clau privada ja que la transacció no es signa
     return true;
@@ -145,5 +156,4 @@ export const createUnsignedTxAction: Action = {
       },
     ],
   ],
-  similes: ["CREATE_UNSIGNED_TX", "UNSIGNED_TRANSACTION", "TX_JSON", "BUILD_TRANSACTION", "createUnsignedTx"],
 };

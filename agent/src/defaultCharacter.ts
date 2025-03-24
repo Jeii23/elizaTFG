@@ -1,9 +1,10 @@
 import { type Character, ModelProviderName, type Plugin } from "@elizaos/core";
+import {evmPlugin} from '@elizaos/plugin-evm'
 
 export const defaultCharacter: Character = {
     name: "Eliza",
     username: "eliza",
-    plugins: [{ name: "@elizaos/plugin-evm" } as Plugin],
+    plugins: [],
     modelProvider: ModelProviderName.OPENAI,
      settings: {
         chains: {
